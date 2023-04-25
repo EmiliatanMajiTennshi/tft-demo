@@ -1,4 +1,4 @@
-export default {
+module.exports = {
     "env": {
         "browser": true,
         "es2021": true
@@ -20,5 +20,7 @@ export default {
         "@typescript-eslint"
     ],
     "rules": {
+        "no-debugger":'off',
+        'react/display-name':'off'
     }
 }
