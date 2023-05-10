@@ -21,6 +21,9 @@ module.exports = {
     ],
     "rules": {
         "no-debugger":'off',
-        'react/display-name':'off'
+        'react/display-name':'off',
+        'react/jsx-key':'off',
+        '@typescript-eslint/no-explicit-any':'off',
+        '@typescript-eslint/ban-ts-comment':'off'
     }
 }

@@ -1,10 +1,24 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { CHANCE, EXPERIENCE } from "../../utils/constant";
-import { DrawCards } from "../DrawCards";
-const DrawChance = () => {
-  const [level, setLevel] = useState(1);
-  const [gold, setGold] = useState(50);
-  const [experience, setExperience] = useState(0);
+import React, { useEffect, useMemo } from "react";
+import { EXPERIENCE } from "../../utils/constant";
+interface IDrawCards {
+  level: number;
+  setLevel: React.Dispatch<React.SetStateAction<number>>;
+  gold: number;
+  setGold: React.Dispatch<React.SetStateAction<number>>;
+  experience: number;
+  setExperience: React.Dispatch<React.SetStateAction<number>>;
+  currentChance: number[];
+}
+const DrawChance = (props: IDrawCards) => {
+  const {
+    level,
+    setLevel,
+    gold,
+    setGold,
+    experience,
+    setExperience,
+    currentChance,
+  } = props;
 
   const currentNeedExperience = EXPERIENCE[level - 1];
   useEffect(() => {
@@ -13,8 +27,6 @@ const DrawChance = () => {
       setExperience(experience - currentNeedExperience);
     }
   }, [experience]);
-
-  const currentChance = useMemo(() => CHANCE[level - 1], [level]);
 
   // 概率文本
   const renderChanceText = useMemo(() => {
@@ -28,6 +40,18 @@ const DrawChance = () => {
       </div>
     );
   }, [level]);
+
+  useEffect(() => {
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === "KeyF") {
+        buyExperience();
+      }
+    };
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [gold, level, experience]);
 
   const buyExperience = () => {
     if (level >= 10) return;
@@ -59,11 +83,6 @@ const DrawChance = () => {
           增加50金币
         </button>
       </div>
-      <DrawCards
-        gold={gold}
-        setGold={setGold}
-        currentChance={currentChance}
-      ></DrawCards>
     </div>
   );
 };
