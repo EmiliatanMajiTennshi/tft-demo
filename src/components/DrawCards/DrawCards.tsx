@@ -251,7 +251,6 @@ const DrawCards = (props: IDrawCards) => {
       }
     }
   };
-  console.log(lv5Cards, 124);
 
   // 购买卡牌
   const buyCard = (card: ICard, cardIndex: number, storeIndex: number) => {
@@ -300,7 +299,10 @@ const DrawCards = (props: IDrawCards) => {
           entanglement: card.entanglement,
         };
         tempCardArr.forEach((item) => {
-          if (item.index === combatSeatsIndex) {
+          if (
+            item.index === tempCardArr[combatSeatsIndex].index &&
+            item.position === "combatSeats"
+          ) {
             return;
           }
           if (item.position === "combatSeats") {
@@ -352,7 +354,10 @@ const DrawCards = (props: IDrawCards) => {
           seatsRef.current[index].name === card.name &&
           seatsRef.current[index].star === 2
         ) {
-          temp2StarArr.push({ index: Number(index), position: "combatSeats" });
+          temp2StarArr.push({
+            index: Number(index),
+            position: "preparationSeats",
+          });
         }
       }
       for (const index in combatSeatsRef.current) {
@@ -364,6 +369,7 @@ const DrawCards = (props: IDrawCards) => {
         }
       }
       if (temp2StarArr.length === 3) {
+        debugger;
         setThreeStarCards([...threeStarCards, card.name]);
         const _seats = seatsRef.current;
         const _combatSeats = combatSeatsRef.current;
@@ -378,7 +384,10 @@ const DrawCards = (props: IDrawCards) => {
             entanglement: card.entanglement,
           };
           temp2StarArr.forEach((item) => {
-            if (item.index === combatSeatsIndex) {
+            if (
+              item.index === temp2StarArr[combatSeatsIndex].index &&
+              item.position === "combatSeats"
+            ) {
               return;
             }
             if (item.position === "combatSeats") {
@@ -419,6 +428,8 @@ const DrawCards = (props: IDrawCards) => {
           };
         }
       }
+      setSeats([..._seats]);
+      setCombatSeats([..._combatSeats]);
       return;
     }
     for (const index in seatsRef.current) {
