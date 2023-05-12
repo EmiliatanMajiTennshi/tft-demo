@@ -5,6 +5,7 @@ import { DrawCards } from "../components/DrawCards";
 import { PreparationSeats } from "../components/PreparationSeats";
 import { CHANCE } from "../utils/constant";
 import { ICard } from "../utils/interface";
+import "./Main.css";
 
 const initPreparationSeats: ICard[] = new Array(9).fill({
   name: "",
@@ -54,6 +55,9 @@ const Main = () => {
   // 当前三星卡
   const [threeStarCards, setThreeStarCards] = useState<string[]>([]);
 
+  // 刷新
+  const [refreshCount, setRefreshCount] = useState(0);
+
   // 当前抽卡概率
   const currentChance = useMemo(() => CHANCE[level - 1], [level]);
 
@@ -65,8 +69,11 @@ const Main = () => {
     experience,
     setExperience,
     currentChance,
+    refreshCount,
+    setRefreshCount,
   };
   const drawCardsProps = {
+    level,
     gold,
     setGold,
     currentChance,
@@ -88,6 +95,8 @@ const Main = () => {
     setCurrentStore,
     threeStarCards,
     setThreeStarCards,
+    refreshCount,
+    setRefreshCount,
   };
   const preparationSeatProps = {
     gold,
@@ -113,9 +122,11 @@ const Main = () => {
 
   return (
     <div>
-      <DrawChance {...drawChanceProps}></DrawChance>
-      <DrawCards {...drawCardsProps}></DrawCards>
       <PreparationSeats {...preparationSeatProps}></PreparationSeats>
+      <div className="store">
+        <DrawChance {...drawChanceProps}></DrawChance>
+        <DrawCards {...drawCardsProps}></DrawCards>
+      </div>
     </div>
   );
 };

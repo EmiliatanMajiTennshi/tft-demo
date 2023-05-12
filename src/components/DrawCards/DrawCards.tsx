@@ -24,6 +24,9 @@ interface IDrawCards {
   setCurrentStore: React.Dispatch<React.SetStateAction<any[]>>;
   threeStarCards: string[];
   setThreeStarCards: React.Dispatch<React.SetStateAction<string[]>>;
+  refreshCount: number;
+  setRefreshCount: React.Dispatch<React.SetStateAction<number>>;
+  level: number;
 }
 
 const DrawCards = (props: IDrawCards) => {
@@ -49,9 +52,10 @@ const DrawCards = (props: IDrawCards) => {
     setCurrentStore,
     threeStarCards,
     setThreeStarCards,
+    refreshCount,
+    setRefreshCount,
+    level,
   } = props;
-
-  const [refreshCount, setRefreshCount] = useState(0);
 
   const seatsRef = useRef<null | ICard[]>(null);
   seatsRef.current = seats;
@@ -60,11 +64,6 @@ const DrawCards = (props: IDrawCards) => {
   const goldRef = useRef<number>(0);
   goldRef.current = gold;
 
-  const refreshShop = () => {
-    if (gold < 2) return;
-    setGold(gold - 2);
-    setRefreshCount(refreshCount + 1);
-  };
   // 初始化卡池
   const needInit = !(
     lv1Cards?.length ||
@@ -73,18 +72,6 @@ const DrawCards = (props: IDrawCards) => {
     lv4Cards?.length ||
     lv5Cards?.length
   );
-
-  useEffect(() => {
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === "KeyD") {
-        refreshShop();
-      }
-    };
-    window.addEventListener("keyup", handleKeyUp);
-    return () => {
-      window.removeEventListener("keyup", handleKeyUp);
-    };
-  }, [refreshCount, gold]);
 
   useEffect(() => {
     if (!needInit) {
@@ -142,11 +129,17 @@ const DrawCards = (props: IDrawCards) => {
     const randomIndex = Math.floor(Math.random() * cardPool.length);
     const randomCard = cardPool[randomIndex];
     if (threeStarCards.indexOf(randomCard.name) !== -1) {
-      // 不能抽到已经三星的卡
-      return getRandomCard(cardPool);
+      try {
+        // 不能抽到已经三星的卡
+        return getRandomCard(cardPool);
+      } catch (err) {
+        console.log(err, "该费用的卡已被抽光, 重新抽其他费用的卡");
+        return getSingleCard();
+      }
     }
     return { card: randomCard, index: randomIndex };
   };
+
   const getCard = (
     lv: 1 | 2 | 3 | 4 | 5
   ): (() => { card: ICard; index: number }) => {
@@ -369,7 +362,6 @@ const DrawCards = (props: IDrawCards) => {
         }
       }
       if (temp2StarArr.length === 3) {
-        debugger;
         setThreeStarCards([...threeStarCards, card.name]);
         const _seats = seatsRef.current;
         const _combatSeats = combatSeatsRef.current;
@@ -449,33 +441,58 @@ const DrawCards = (props: IDrawCards) => {
     }
   };
 
+  // 概率文本
+  const renderChanceText = useMemo(() => {
+    return (
+      <div>
+        {currentChance.map((chance, index) => (
+          <span key={index} className={"current-draw-chance"}>
+            {`lv${index + 1}: ${chance * 100}%`}&nbsp;&nbsp;
+          </span>
+        ))}
+      </div>
+    );
+  }, [level]);
+
+  // 商店
   const renderShop = useMemo(() => {
     return currentStore.map((item, storeIndex) => {
       const { card, index: cardIndex } = item;
-      console.log(card);
-
       return (
-        <span>
-          <span
-            style={{
-              margin: "8px",
-              padding: "4px",
-              color: getColor(card?.level),
-            }}
-            onClick={() => buyCard(card, cardIndex, storeIndex)}
-          >
-            {card?.name}
-          </span>
-        </span>
+        <div
+          style={{
+            width: "220px",
+            height: "150px",
+            border: "1px solid blue",
+            margin: "8px",
+            padding: "1px",
+            color: getColor(card?.level),
+          }}
+          onClick={() => buyCard(card, cardIndex, storeIndex)}
+        >
+          {card?.name && (
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                backgroundColor: getColor(card?.level),
+                color: "#fff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {card?.name}
+            </div>
+          )}
+        </div>
       );
     });
   }, [...currentStore, lv1Cards, lv2Cards, lv3Cards, lv4Cards, lv5Cards]);
   return (
     <div>
-      <span>
-        <button onClick={refreshShop}>刷新</button>
-      </span>
-      <div>{renderShop}</div>
+      <div style={{ textAlign: "left" }}>{renderChanceText}</div>
+      <div style={{ display: " flex" }}>{renderShop}</div>
     </div>
   );
 };

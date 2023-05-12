@@ -206,6 +206,9 @@ const PreparationSeat = (props: IPreparationSeat) => {
                 margin: "8px",
                 padding: "4px",
                 border: "3px hotpink solid",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
               key={index}
               onDragOver={onDragOver(index, "combatSeats")}
@@ -220,7 +223,9 @@ const PreparationSeat = (props: IPreparationSeat) => {
               }}
             >
               <div
-                style={{ color: getColor(item?.level) }}
+                style={{
+                  color: getColor(item?.level),
+                }}
                 draggable
                 onDragStart={onDragStart(index, "combatSeats")}
                 onMouseOver={() => {
@@ -253,6 +258,9 @@ const PreparationSeat = (props: IPreparationSeat) => {
                 margin: "8px",
                 padding: "4px",
                 border: "3px hotpink solid",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
               key={index}
               onDragOver={onDragOver(index, "preparationSeats")}
@@ -269,7 +277,9 @@ const PreparationSeat = (props: IPreparationSeat) => {
               <div
                 draggable={true}
                 onDragStart={onDragStart(index, "preparationSeats")}
-                style={{ color: getColor(item?.level) }}
+                style={{
+                  color: getColor(item?.level),
+                }}
                 onMouseOver={() => {
                   setCurrentCard(index);
                   setCurPosition("preparationSeats");

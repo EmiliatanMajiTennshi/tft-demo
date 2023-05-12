@@ -8,6 +8,8 @@ interface IDrawCards {
   experience: number;
   setExperience: React.Dispatch<React.SetStateAction<number>>;
   currentChance: number[];
+  refreshCount: number;
+  setRefreshCount: React.Dispatch<React.SetStateAction<number>>;
 }
 const DrawChance = (props: IDrawCards) => {
   const {
@@ -18,6 +20,8 @@ const DrawChance = (props: IDrawCards) => {
     experience,
     setExperience,
     currentChance,
+    refreshCount,
+    setRefreshCount,
   } = props;
 
   const currentNeedExperience = EXPERIENCE[level - 1];
@@ -27,19 +31,6 @@ const DrawChance = (props: IDrawCards) => {
       setExperience(experience - currentNeedExperience);
     }
   }, [experience]);
-
-  // 概率文本
-  const renderChanceText = useMemo(() => {
-    return (
-      <div>
-        {currentChance.map((chance, index) => (
-          <span key={index} className={"current-draw-chance"}>{`lv${index}: ${
-            chance * 100
-          }%`}</span>
-        ))}
-      </div>
-    );
-  }, [level]);
 
   useEffect(() => {
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -52,6 +43,17 @@ const DrawChance = (props: IDrawCards) => {
       window.removeEventListener("keyup", handleKeyUp);
     };
   }, [gold, level, experience]);
+  useEffect(() => {
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === "KeyD") {
+        refreshShop();
+      }
+    };
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [refreshCount, gold]);
 
   const buyExperience = () => {
     if (level >= 10) return;
@@ -62,27 +64,49 @@ const DrawChance = (props: IDrawCards) => {
     setExperience(experience + 4);
     setGold(gold - 4);
   };
+  const refreshShop = () => {
+    if (gold < 2) return;
+    setGold(gold - 2);
+    setRefreshCount(refreshCount + 1);
+  };
   return (
     <div>
-      <h1>{renderChanceText}</h1>
-      <h1>当前等级: lv{level}</h1>
+      <div style={{ fontSize: 16, fontWeight: 700 }}>当前等级: lv{level}</div>
       <div>
         当前经验: {experience}/{currentNeedExperience || 0}
       </div>
-      <div> {experience}</div>
-      <div>
-        <button onClick={buyExperience}>升级</button>
+      <div style={{ margin: "5px 0" }}>
+        <button
+          style={{
+            width: "150px",
+            height: "40px",
+          }}
+          onClick={buyExperience}
+        >
+          升级
+        </button>
+      </div>
+      <div style={{ margin: "5px 0" }}>
+        <button
+          style={{
+            width: "150px",
+            height: "40px",
+          }}
+          onClick={refreshShop}
+        >
+          刷新
+        </button>
       </div>
       <div>
         <span>当前金币: {gold}</span>
-        <button
-          onClick={() => {
-            setGold(gold + 50);
-          }}
-        >
-          增加50金币
-        </button>
       </div>
+      <button
+        onClick={() => {
+          setGold(gold + 50);
+        }}
+      >
+        增加50金币
+      </button>
     </div>
   );
 };
