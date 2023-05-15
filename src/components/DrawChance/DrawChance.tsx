@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { EXPERIENCE } from "../../utils/constant";
 interface IDrawCards {
   level: number;
@@ -19,7 +19,6 @@ const DrawChance = (props: IDrawCards) => {
     setGold,
     experience,
     setExperience,
-    currentChance,
     refreshCount,
     setRefreshCount,
   } = props;

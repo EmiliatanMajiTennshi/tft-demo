@@ -61,6 +61,11 @@ const Main = () => {
   // 当前抽卡概率
   const currentChance = useMemo(() => CHANCE[level - 1], [level]);
 
+  // 不同等级三星卡数量
+  const [threeStarCount, setThreeStarCount] = useState<number[]>([
+    0, 0, 0, 0, 0,
+  ]);
+
   const drawChanceProps = {
     level,
     setLevel,
@@ -97,6 +102,8 @@ const Main = () => {
     setThreeStarCards,
     refreshCount,
     setRefreshCount,
+    threeStarCount,
+    setThreeStarCount,
   };
   const preparationSeatProps = {
     gold,
@@ -118,7 +125,6 @@ const Main = () => {
     combatSeats,
     setCombatSeats,
   };
-  console.log(lv5Cards, 14);
 
   return (
     <div>

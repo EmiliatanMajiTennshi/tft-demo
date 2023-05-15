@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { CARDS } from "../../utils/constant";
 import { ICard } from "../../utils/interface";
 import { getColor } from "../../utils/common";
@@ -27,8 +27,15 @@ interface IDrawCards {
   refreshCount: number;
   setRefreshCount: React.Dispatch<React.SetStateAction<number>>;
   level: number;
+  threeStarCount: number[];
+  setThreeStarCount: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
+const LV1_AMOUNT = 39;
+const LV2_AMOUNT = 26;
+const LV3_AMOUNT = 21;
+const LV4_AMOUNT = 13;
+const LV5_AMOUNT = 3;
 const DrawCards = (props: IDrawCards) => {
   const {
     gold,
@@ -55,8 +62,11 @@ const DrawCards = (props: IDrawCards) => {
     refreshCount,
     setRefreshCount,
     level,
+    threeStarCount,
+    setThreeStarCount,
   } = props;
 
+  const selectedCardsRef = useRef<{ card: ICard; index: number }[]>([]); //记录已经被选入商店的卡牌
   const seatsRef = useRef<null | ICard[]>(null);
   seatsRef.current = seats;
   const combatSeatsRef = useRef<null | ICard[]>(null);
@@ -79,7 +89,7 @@ const DrawCards = (props: IDrawCards) => {
     }
     const _lv1Cards: ICard[] = [];
     CARDS.lv1Cards.map((card) => {
-      const tempArr = new Array(39).fill(card);
+      const tempArr = new Array(LV1_AMOUNT).fill(card);
       tempArr.forEach((item) => {
         _lv1Cards.push(item);
       });
@@ -88,7 +98,7 @@ const DrawCards = (props: IDrawCards) => {
     // 二费卡
     const _lv2Cards: ICard[] = [];
     CARDS.lv2Cards.map((card) => {
-      const tempArr = new Array(26).fill(card);
+      const tempArr = new Array(LV2_AMOUNT).fill(card);
       tempArr.forEach((item) => {
         _lv2Cards.push(item);
       });
@@ -97,7 +107,7 @@ const DrawCards = (props: IDrawCards) => {
     // 三费卡
     const _lv3Cards: ICard[] = [];
     CARDS.lv3Cards.map((card) => {
-      const tempArr = new Array(21).fill(card);
+      const tempArr = new Array(LV3_AMOUNT).fill(card);
       tempArr.forEach((item) => {
         _lv3Cards.push(item);
       });
@@ -106,7 +116,7 @@ const DrawCards = (props: IDrawCards) => {
     // 四费卡
     const _lv4Cards: ICard[] = [];
     CARDS.lv4Cards.map((card) => {
-      const tempArr = new Array(13).fill(card);
+      const tempArr = new Array(LV4_AMOUNT).fill(card);
       tempArr.forEach((item) => {
         _lv4Cards.push(item);
       });
@@ -115,7 +125,7 @@ const DrawCards = (props: IDrawCards) => {
     // 五费卡
     const _lv5Cards: ICard[] = [];
     CARDS.lv5Cards.map((card) => {
-      const tempArr = new Array(10).fill(card);
+      const tempArr = new Array(LV5_AMOUNT).fill(card);
       tempArr.forEach((item) => {
         _lv5Cards.push(item);
       });
@@ -128,7 +138,18 @@ const DrawCards = (props: IDrawCards) => {
   const getRandomCard = (cardPool: ICard[]): { card: ICard; index: number } => {
     const randomIndex = Math.floor(Math.random() * cardPool.length);
     const randomCard = cardPool[randomIndex];
-    if (threeStarCards.indexOf(randomCard.name) !== -1) {
+    //防止商店的卡重复
+    let flag = 0;
+    selectedCardsRef.current.forEach((item) => {
+      if (item.index === randomIndex && item.card.name === randomCard.name) {
+        flag = 1;
+      }
+    });
+    selectedCardsRef.current = [
+      ...selectedCardsRef.current,
+      { card: randomCard, index: randomIndex },
+    ];
+    if (threeStarCards.indexOf(randomCard.name) !== -1 || flag === 1) {
       try {
         // 不能抽到已经三星的卡
         return getRandomCard(cardPool);
@@ -137,6 +158,7 @@ const DrawCards = (props: IDrawCards) => {
         return getSingleCard();
       }
     }
+
     return { card: randomCard, index: randomIndex };
   };
 
@@ -179,6 +201,7 @@ const DrawCards = (props: IDrawCards) => {
   };
 
   useEffect(() => {
+    selectedCardsRef.current = [];
     const _currentStore = [1, 1, 1, 1, 1].map(() => {
       return getSingleCard();
     });
@@ -187,26 +210,36 @@ const DrawCards = (props: IDrawCards) => {
 
   // 商店每张独立的牌
   const getSingleCard = (): { card: ICard; index: number } => {
+    debugger;
     if (needInit)
       return {
         card: { name: "等待初始化", level: 1, star: 1, entanglement: [""] },
         index: 1,
       };
     const randomNum = Math.random();
-    if (randomNum < currentChance[0]) {
+    if (randomNum < currentChance[0] && threeStarCount[0] < LV1_AMOUNT) {
       return getCard(1)();
-    } else if (randomNum < currentChance[0] + currentChance[1]) {
+    } else if (
+      randomNum < currentChance[0] + currentChance[1] &&
+      threeStarCount[1] < LV2_AMOUNT
+    ) {
       return getCard(2)();
     } else if (
-      randomNum <
-      currentChance[0] + currentChance[1] + currentChance[2]
+      randomNum < currentChance[0] + currentChance[1] + currentChance[2] &&
+      threeStarCount[2] < LV3_AMOUNT
     ) {
       return getCard(3)();
     } else if (
       randomNum <
-      currentChance[0] + currentChance[1] + currentChance[2] + currentChance[3]
+        currentChance[0] +
+          currentChance[1] +
+          currentChance[2] +
+          currentChance[3] &&
+      threeStarCount[3] < LV4_AMOUNT
     ) {
       return getCard(4)();
+    } else if (threeStarCount[4] >= LV5_AMOUNT) {
+      return getSingleCard();
     } else {
       return getCard(5)();
     }
@@ -254,7 +287,6 @@ const DrawCards = (props: IDrawCards) => {
       goldRef.current < card.level
     )
       return;
-    // 合成2星
     const tempCardArr: {
       index: number;
       position: "combatSeats" | "preparationSeats";
@@ -363,6 +395,23 @@ const DrawCards = (props: IDrawCards) => {
       }
       if (temp2StarArr.length === 3) {
         setThreeStarCards([...threeStarCards, card.name]);
+        const _threeStarCount = threeStarCount;
+        if (card.level === 1) {
+          _threeStarCount[0] = _threeStarCount[0] + 1;
+        }
+        if (card.level === 2) {
+          _threeStarCount[1] = _threeStarCount[1] + 1;
+        }
+        if (card.level === 3) {
+          _threeStarCount[2] = _threeStarCount[2] + 1;
+        }
+        if (card.level === 4) {
+          _threeStarCount[3] = _threeStarCount[3] + 1;
+        }
+        if (card.level === 5) {
+          _threeStarCount[4] = _threeStarCount[4] + 1;
+        }
+        setThreeStarCount(_threeStarCount);
         const _seats = seatsRef.current;
         const _combatSeats = combatSeatsRef.current;
         const combatSeatsIndex = temp2StarArr.findIndex(
@@ -440,6 +489,7 @@ const DrawCards = (props: IDrawCards) => {
       }
     }
   };
+  console.log(lv5Cards, 11);
 
   // 概率文本
   const renderChanceText = useMemo(() => {
@@ -456,6 +506,8 @@ const DrawCards = (props: IDrawCards) => {
 
   // 商店
   const renderShop = useMemo(() => {
+    console.log(currentStore, 124);
+
     return currentStore.map((item, storeIndex) => {
       const { card, index: cardIndex } = item;
       return (
@@ -488,7 +540,15 @@ const DrawCards = (props: IDrawCards) => {
         </div>
       );
     });
-  }, [...currentStore, lv1Cards, lv2Cards, lv3Cards, lv4Cards, lv5Cards]);
+  }, [
+    ...currentStore,
+    lv1Cards,
+    lv2Cards,
+    lv3Cards,
+    lv4Cards,
+    lv5Cards,
+    threeStarCount,
+  ]);
   return (
     <div>
       <div style={{ textAlign: "left" }}>{renderChanceText}</div>
