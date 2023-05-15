@@ -35,7 +35,7 @@ const LV1_AMOUNT = 39;
 const LV2_AMOUNT = 26;
 const LV3_AMOUNT = 21;
 const LV4_AMOUNT = 13;
-const LV5_AMOUNT = 3;
+const LV5_AMOUNT = 10;
 const DrawCards = (props: IDrawCards) => {
   const {
     gold,
@@ -217,16 +217,19 @@ const DrawCards = (props: IDrawCards) => {
         index: 1,
       };
     const randomNum = Math.random();
-    if (randomNum < currentChance[0] && threeStarCount[0] < LV1_AMOUNT) {
+    if (
+      randomNum < currentChance[0] &&
+      threeStarCount[0] < CARDS.lv1Cards.length
+    ) {
       return getCard(1)();
     } else if (
       randomNum < currentChance[0] + currentChance[1] &&
-      threeStarCount[1] < LV2_AMOUNT
+      threeStarCount[1] < CARDS.lv2Cards.length
     ) {
       return getCard(2)();
     } else if (
       randomNum < currentChance[0] + currentChance[1] + currentChance[2] &&
-      threeStarCount[2] < LV3_AMOUNT
+      threeStarCount[2] < CARDS.lv3Cards.length
     ) {
       return getCard(3)();
     } else if (
@@ -235,10 +238,10 @@ const DrawCards = (props: IDrawCards) => {
           currentChance[1] +
           currentChance[2] +
           currentChance[3] &&
-      threeStarCount[3] < LV4_AMOUNT
+      threeStarCount[3] < CARDS.lv4Cards.length
     ) {
       return getCard(4)();
-    } else if (threeStarCount[4] >= LV5_AMOUNT) {
+    } else if (threeStarCount[4] >= CARDS.lv5Cards.length) {
       return getSingleCard();
     } else {
       return getCard(5)();
