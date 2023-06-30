@@ -70,10 +70,36 @@ const DrawChance = (props: IDrawCards) => {
   };
   return (
     <div>
-      <div style={{ fontSize: 16, fontWeight: 700 }}>当前等级: lv{level}</div>
-      <div>
-        当前经验: {experience}/{currentNeedExperience || 0}
+      <div
+        style={{
+          fontSize: 20,
+          fontWeight: 700,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <span>
+          {level}级{" "}
+          <span
+            style={{
+              fontSize: "10px",
+              color: "orange",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              setLevel(1);
+              setExperience(0);
+            }}
+          >
+            重置等级
+          </span>
+        </span>
+        <div style={{ marginRight: 10, fontWeight: 400, fontSize: 16 }}>
+          {experience}/{currentNeedExperience || 0}
+        </div>
       </div>
+
       <div style={{ margin: "5px 0" }}>
         <button
           style={{
@@ -100,6 +126,7 @@ const DrawChance = (props: IDrawCards) => {
         <span>当前金币: {gold}</span>
       </div>
       <button
+        style={{ width: "100%", height: 40 }}
         onClick={() => {
           setGold(gold + 50);
         }}

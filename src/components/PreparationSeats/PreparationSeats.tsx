@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { ICard } from "../../utils/interface";
-import { getColor } from "../../utils/common";
 
 interface IPreparationSeat {
   gold: number;
@@ -21,6 +20,8 @@ interface IPreparationSeat {
   setLv5Cards: React.Dispatch<React.SetStateAction<ICard[]>>;
   threeStarCards: string[];
   setThreeStarCards: React.Dispatch<React.SetStateAction<string[]>>;
+  threeStarCount: number[];
+  setThreeStarCount: React.Dispatch<React.SetStateAction<number[]>>;
 }
 type Position = "combatSeats" | "preparationSeats" | null;
 const PreparationSeat = (props: IPreparationSeat) => {
@@ -43,6 +44,8 @@ const PreparationSeat = (props: IPreparationSeat) => {
     setLv5Cards,
     threeStarCards,
     setThreeStarCards,
+    threeStarCount,
+    setThreeStarCount,
   } = props;
   const [source, setSource] = useState<null | number>(null);
   const [target, setTarget] = useState<null | number>(null);
@@ -70,7 +73,6 @@ const PreparationSeat = (props: IPreparationSeat) => {
     setTo(null);
   };
   const onDrop = () => {
-    debugger;
     if (source === null || target === null) return;
     const sourceItem =
       from === "combatSeats" ? combatSeats[source] : seats[source];
@@ -123,6 +125,12 @@ const PreparationSeat = (props: IPreparationSeat) => {
           const _threeStarCards = threeStarCards;
           _threeStarCards.splice(_threeStarCards.indexOf(_currentCard.name), 1);
           setThreeStarCards([..._threeStarCards]);
+
+          // 减少对应等级三星卡的数量记录
+          const _threeStarCount = threeStarCount;
+          _threeStarCount[_currentCard.level - 1] =
+            _threeStarCount[_currentCard.level - 1] - 1;
+          setThreeStarCount(_threeStarCount);
         }
         // 返回商店的卡
         const tempArr: ICard[] = [];
@@ -132,6 +140,11 @@ const PreparationSeat = (props: IPreparationSeat) => {
             star: 1,
           });
         }
+
+        // eval(
+        //   `setLv${_currentCard.level}Cards([...lv${_currentCard.level}Cards,...tempArr])`
+        // );
+
         if (_currentCard.level === 1) {
           setLv1Cards([...lv1Cards, ...tempArr]);
         }
@@ -190,10 +203,10 @@ const PreparationSeat = (props: IPreparationSeat) => {
     <div>
       <div
         style={{
-          width: "1040px",
+          width: "900px",
           display: "flex",
           flexWrap: "wrap",
-          margin: "0 auto",
+          margin: "20px auto",
         }}
         onDrop={onDrop}
       >
@@ -205,10 +218,17 @@ const PreparationSeat = (props: IPreparationSeat) => {
                 height: "100px",
                 margin: "8px",
                 padding: "4px",
-                border: "3px hotpink solid",
+                // border: "3px hotpink solid",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                backgroundImage:
+                  "url(https://game.gtimg.cn/images/lol/act/a20220802tftsimulator/slot-bg.png)",
+                backgroundSize: "80%",
+                backgroundRepeat: "no-repeat",
+                backgroundPositionX: "10px",
+                backgroundPositionY: "5px",
+                marginLeft: `${index === 7 || index === 21 ? 57 : 0}px`,
               }}
               key={index}
               onDragOver={onDragOver(index, "combatSeats")}
@@ -224,7 +244,10 @@ const PreparationSeat = (props: IPreparationSeat) => {
             >
               <div
                 style={{
-                  color: getColor(item?.level),
+                  width: "100%",
+                  height: "100%",
+                  backgroundImage: `url(${item?.avatar})`,
+                  backgroundSize: "cover",
                 }}
                 draggable
                 onDragStart={onDragStart(index, "combatSeats")}
@@ -237,9 +260,18 @@ const PreparationSeat = (props: IPreparationSeat) => {
                   setCurPosition(null);
                 }}
               >
-                {item.name && item.star !== 1
-                  ? `${item.star}x${item.name}`
-                  : item.name}
+                <div
+                  style={{
+                    color: "gold",
+                    backdropFilter: "blur(3px)",
+                  }}
+                >
+                  {item?.name &&
+                    item?.name !== "" &&
+                    new Array(item?.star).fill(0).map(() => {
+                      return "★";
+                    })}
+                </div>
               </div>
             </div>
           );
@@ -278,7 +310,10 @@ const PreparationSeat = (props: IPreparationSeat) => {
                 draggable={true}
                 onDragStart={onDragStart(index, "preparationSeats")}
                 style={{
-                  color: getColor(item?.level),
+                  width: "100%",
+                  height: "100%",
+                  backgroundImage: `url(${item?.avatar})`,
+                  backgroundSize: "cover",
                 }}
                 onMouseOver={() => {
                   setCurrentCard(index);
@@ -289,9 +324,13 @@ const PreparationSeat = (props: IPreparationSeat) => {
                   setCurPosition(null);
                 }}
               >
-                {item.name && item.star !== 1
-                  ? `${item.star}x${item.name}`
-                  : item.name}
+                <span style={{ color: "gold" }}>
+                  {item?.name &&
+                    item?.name !== "" &&
+                    new Array(item?.star).fill(0).map(() => {
+                      return "★";
+                    })}
+                </span>
               </div>
             </div>
           );

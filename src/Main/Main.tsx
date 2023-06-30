@@ -19,7 +19,7 @@ const initStore: ICard[] = new Array(5).fill({
   star: 1,
   entanglement: [""],
 });
-const initCombatSeats: ICard[] = new Array(32).fill({
+const initCombatSeats: ICard[] = new Array(28).fill({
   name: "",
   level: 0,
   star: 1,
@@ -124,6 +124,8 @@ const Main = () => {
     setThreeStarCards,
     combatSeats,
     setCombatSeats,
+    threeStarCount,
+    setThreeStarCount,
   };
 
   return (

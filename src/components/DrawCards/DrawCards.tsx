@@ -210,7 +210,6 @@ const DrawCards = (props: IDrawCards) => {
 
   // 商店每张独立的牌
   const getSingleCard = (): { card: ICard; index: number } => {
-    debugger;
     if (needInit)
       return {
         card: { name: "等待初始化", level: 1, star: 1, entanglement: [""] },
@@ -325,6 +324,8 @@ const DrawCards = (props: IDrawCards) => {
           level: card.level,
           star: 2,
           entanglement: card.entanglement,
+          img: card?.img,
+          avatar: card?.avatar,
         };
         tempCardArr.forEach((item) => {
           if (
@@ -356,6 +357,8 @@ const DrawCards = (props: IDrawCards) => {
           level: card.level,
           star: 2,
           entanglement: card.entanglement,
+          img: card?.img,
+          avatar: card?.avatar,
         };
         _seats[tempCardArr[1].index] = {
           name: "",
@@ -399,21 +402,9 @@ const DrawCards = (props: IDrawCards) => {
       if (temp2StarArr.length === 3) {
         setThreeStarCards([...threeStarCards, card.name]);
         const _threeStarCount = threeStarCount;
-        if (card.level === 1) {
-          _threeStarCount[0] = _threeStarCount[0] + 1;
-        }
-        if (card.level === 2) {
-          _threeStarCount[1] = _threeStarCount[1] + 1;
-        }
-        if (card.level === 3) {
-          _threeStarCount[2] = _threeStarCount[2] + 1;
-        }
-        if (card.level === 4) {
-          _threeStarCount[3] = _threeStarCount[3] + 1;
-        }
-        if (card.level === 5) {
-          _threeStarCount[4] = _threeStarCount[4] + 1;
-        }
+
+        _threeStarCount[card.level - 1] = _threeStarCount[card.level - 1] + 1;
+
         setThreeStarCount(_threeStarCount);
         const _seats = seatsRef.current;
         const _combatSeats = combatSeatsRef.current;
@@ -426,6 +417,8 @@ const DrawCards = (props: IDrawCards) => {
             level: card.level,
             star: 3,
             entanglement: card.entanglement,
+            img: card?.img,
+            avatar: card?.avatar,
           };
           temp2StarArr.forEach((item) => {
             if (
@@ -457,6 +450,8 @@ const DrawCards = (props: IDrawCards) => {
             level: card.level,
             star: 3,
             entanglement: card.entanglement,
+            img: card?.img,
+            avatar: card?.avatar,
           };
           _seats[temp2StarArr[1].index] = {
             name: "",
@@ -497,15 +492,22 @@ const DrawCards = (props: IDrawCards) => {
   // 概率文本
   const renderChanceText = useMemo(() => {
     return (
-      <div>
-        {currentChance.map((chance, index) => (
-          <span key={index} className={"current-draw-chance"}>
-            {`lv${index + 1}: ${chance * 100}%`}&nbsp;&nbsp;
-          </span>
-        ))}
+      <div
+        style={{ marginLeft: "20px", display: "flex", alignItems: "center" }}
+      >
+        <div>
+          {currentChance.map((chance, index) => (
+            <span key={index} className={"current-draw-chance"}>
+              {`lv${index + 1}: ${chance * 100}%`}&nbsp;&nbsp;
+            </span>
+          ))}
+        </div>
+        <div style={{ fontSize: "20px", fontWeight: 700, marginLeft: "200px" }}>
+          剩余金币:{gold}
+        </div>
       </div>
     );
-  }, [level]);
+  }, [level, gold]);
 
   // 商店
   const renderShop = useMemo(() => {
@@ -516,28 +518,47 @@ const DrawCards = (props: IDrawCards) => {
       return (
         <div
           style={{
-            width: "220px",
-            height: "150px",
+            width: "240px",
+            height: "170px",
             border: "1px solid blue",
             margin: "8px",
-            padding: "1px",
-            color: getColor(card?.level),
           }}
           onClick={() => buyCard(card, cardIndex, storeIndex)}
         >
           {card?.name && (
             <div
               style={{
-                width: "100%",
-                height: "100%",
+                width: "230px",
+                height: "160px",
+                padding: "5px",
                 backgroundColor: getColor(card?.level),
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
               }}
             >
-              {card?.name}
+              <div
+                style={{
+                  width: "100%",
+                  height: "80%",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundImage: `url('${card?.img}')`,
+                  backgroundSize: "cover",
+                }}
+              ></div>
+              <div
+                style={{
+                  marginTop: "5px",
+                  color: "#fff",
+                  fontSize: "18px",
+                  fontWeight: "700",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>{card?.name}</div>
+                <div>{card?.level}</div>
+              </div>
             </div>
           )}
         </div>

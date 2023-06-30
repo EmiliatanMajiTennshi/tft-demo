@@ -3,4 +3,6 @@ export interface ICard {
   name: string;
   entanglement: string[];
   star: 1 | 2 | 3;
+  img?: string;
+  avatar?: string;
 }
